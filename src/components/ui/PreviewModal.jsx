@@ -1,7 +1,25 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { injectChannels } from '../../utils/messaging'
 import { copyToClipboard } from '../../utils/clipboard'
 import { CopyButton, DownloadButton } from './ActionButtons'
+
+/* ── Warning Toast (scoped to modal) ── */
+
+function WarningToast({ visible }) {
+  return (
+    <div
+      className={`absolute bottom-6 left-1/2 z-10 -translate-x-1/2 rounded-lg bg-amber-50 border border-amber-300 px-5 py-3 shadow-lg transition-all duration-300 ${
+        visible
+          ? 'translate-y-0 opacity-100'
+          : 'translate-y-3 opacity-0 pointer-events-none'
+      }`}
+    >
+      <p className="whitespace-nowrap text-sm font-medium text-amber-800">
+        Heads up — without a Bot Token, the OpenClaw build will fail.
+      </p>
+    </div>
+  )
+}
 
 /* ── Syntax highlighting (lightweight, no deps) ── */
 
@@ -36,10 +54,19 @@ export default function PreviewModal({
   channels,
 }) {
   const dialogRef = useRef(null)
+  const warningTimer = useRef(null)
   const [json, setJson] = useState('')
   const [copyState, setCopyState] = useState('idle')
   const [dlState, setDlState] = useState('idle')
   const [closing, setClosing] = useState(false)
+  const [warningVisible, setWarningVisible] = useState(false)
+
+  const flashWarning = useCallback(() => {
+    if (channels?.telegramToken?.trim()) return
+    clearTimeout(warningTimer.current)
+    setWarningVisible(true)
+    warningTimer.current = setTimeout(() => setWarningVisible(false), 4000)
+  }, [channels])
 
   // Open / close dialog with exit animation
   useEffect(() => {
@@ -87,6 +114,7 @@ export default function PreviewModal({
   }
 
   const handleCopy = async () => {
+    flashWarning()
     const ok = await copyToClipboard(json)
     if (ok) {
       setCopyState('done')
@@ -105,6 +133,7 @@ export default function PreviewModal({
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
     setDlState('done')
+    flashWarning()
     setTimeout(() => setDlState('idle'), 2000)
   }
 
@@ -133,7 +162,10 @@ export default function PreviewModal({
         ${closing ? 'animate-slide-down backdrop:animate-backdrop-out' : 'animate-slide-up backdrop:animate-backdrop-in'}
       `}
     >
-      <div className="flex h-full flex-col">
+      <div className="relative flex h-full flex-col">
+        {/* Token warning (scoped inside modal) */}
+        <WarningToast visible={warningVisible} />
+
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-stone-100 px-5 py-3.5 sm:px-6">
           <div className="flex items-center gap-3">

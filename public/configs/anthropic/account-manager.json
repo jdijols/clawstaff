@@ -19,7 +19,8 @@
     ]
   },
   "env": {
-    "ANTHROPIC_API_KEY": "your-anthropic-api-key"
+    "ANTHROPIC_API_KEY": "your-anthropic-api-key",
+    "TELEGRAM_BOT_TOKEN": ""
   },
   "channels": {
     "whatsapp": {

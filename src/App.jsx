@@ -1,60 +1,119 @@
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import RoleCard from './components/ui/RoleCard'
 import ProviderToggle from './components/ui/ProviderToggle'
+import HardwareToggle from './components/ui/HardwareToggle'
 import MessagingInputs from './components/ui/MessagingInputs'
 import InfoModal from './components/ui/InfoModal'
-import useDownloadSet from './hooks/useDownloadSet'
+import { injectChannels } from './utils/messaging'
+
+function WarningToast({ message, visible, onDone }) {
+  useEffect(() => {
+    if (visible) {
+      const t = setTimeout(onDone, 4000)
+      return () => clearTimeout(t)
+    }
+  }, [visible, onDone])
+
+  return (
+    <div
+      className={`fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 rounded-lg bg-amber-50 border border-amber-300 px-5 py-3 shadow-lg transition-all duration-300 ${
+        visible
+          ? 'translate-y-0 opacity-100'
+          : 'translate-y-4 opacity-0 pointer-events-none'
+      }`}
+    >
+      <p className="text-sm font-medium text-amber-800">{message}</p>
+    </div>
+  )
+}
 
 const ROLES = [
+  {
+    icon: '\u{1F91E}',
+    title: 'Demo',
+    description: 'General-purpose assistant — try it out',
+    configFile: 'demo.json',
+    disabled: false,
+  },
   {
     icon: '\u{1F3A8}',
     title: 'UX Designer',
     description: 'Wireframes & prototypes in hours',
     configFile: 'ux-designer.json',
+    disabled: true,
   },
   {
     icon: '\u{1F4BB}',
     title: 'Software Developer',
     description: 'Ship features 10x faster',
     configFile: 'software-developer.json',
+    disabled: true,
   },
   {
     icon: '\u{1F52C}',
     title: 'UX Researcher',
     description: 'Insights in days, not months',
     configFile: 'ux-researcher.json',
+    disabled: true,
   },
   {
     icon: '\u{1F9EA}',
     title: 'QA Tester',
     description: 'Catch bugs before they ship',
     configFile: 'qa-tester.json',
+    disabled: true,
   },
   {
     icon: '\u{1F4CA}',
     title: 'Project Manager',
     description: 'Client updates on autopilot',
     configFile: 'project-manager.json',
+    disabled: true,
   },
   {
     icon: '\u{1F91D}',
     title: 'Account Manager',
     description: 'Proposals & relationships, handled',
     configFile: 'account-manager.json',
+    disabled: true,
   },
 ]
 
 export default function App() {
   const [provider, setProvider] = useState('ollama')
-  const [whatsappPhone, setWhatsappPhone] = useState('')
-  const [discordToken, setDiscordToken] = useState('')
+  const [hardware, setHardware] = useState('intel')
   const [telegramToken, setTelegramToken] = useState('')
-  const [slackBotToken, setSlackBotToken] = useState('')
-  const [slackAppToken, setSlackAppToken] = useState('')
   const [infoOpen, setInfoOpen] = useState(false)
-  const { downloadSet, downloading } = useDownloadSet({
-    provider, whatsappPhone, discordToken, telegramToken, slackBotToken, slackAppToken,
-  })
+  const [toastVisible, setToastVisible] = useState(false)
+
+  // Build config base path: ollama uses hardware subdirectory
+  const configBase = provider === 'ollama' && hardware
+    ? `/configs/ollama/${hardware}`
+    : `/configs/${provider}`
+
+  const showTokenWarning = useCallback(() => {
+    setToastVisible(true)
+  }, [])
+
+  const handleDownload = useCallback(async () => {
+    if (!telegramToken.trim()) showTokenWarning()
+    try {
+      const res = await fetch(`${configBase}/demo.json`)
+      const config = await res.json()
+      injectChannels(config, { telegramToken })
+      const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'openclaw.json'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Failed to download demo config:', err)
+    }
+  }, [configBase, telegramToken])
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900">
@@ -70,11 +129,10 @@ export default function App() {
           {/* Right: Actions */}
           <div className="flex items-center gap-3">
             <button
-              onClick={downloadSet}
-              disabled={downloading}
-              className="cursor-pointer rounded-lg bg-rust-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-rust-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleDownload}
+              className="cursor-pointer rounded-lg bg-rust-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-rust-500"
             >
-              {downloading ? 'Zipping...' : 'Download Set'}
+              Download
             </button>
             <button
               onClick={() => setInfoOpen(true)}
@@ -99,8 +157,9 @@ export default function App() {
         <p className="mx-auto mt-4 max-w-2xl text-lg text-stone-500">
           For every role in your AI-native agency.
           <br />
-          Copy a single file or download the set. Deliver today.
+          Download a config, drop it in, and deliver today.
         </p>
+        <p className="mt-2 text-sm italic text-rust-500">(eventually..)</p>
       </section>
 
       {/* Config Setup */}
@@ -114,66 +173,58 @@ export default function App() {
             </div>
           </div>
 
+          {/* Hardware (Ollama only) */}
+          {provider === 'ollama' && (
+            <>
+              <hr className="my-6 border-stone-100" />
+              <div>
+                <p className="text-sm font-medium text-stone-500">Hardware</p>
+                <div className="mt-3">
+                  <HardwareToggle selected={hardware} onChange={setHardware} />
+                </div>
+              </div>
+            </>
+          )}
+
           {/* Divider */}
           <hr className="my-6 border-stone-100" />
 
           {/* Messaging */}
           <div>
             <p className="text-sm font-medium text-stone-500">
-              Messaging integrations{' '}
-              <span className="text-stone-400">(optional)</span>
+              Messaging
             </p>
             <div className="mt-3">
               <MessagingInputs
-                whatsappPhone={whatsappPhone}
-                onWhatsappChange={setWhatsappPhone}
-                discordToken={discordToken}
-                onDiscordChange={setDiscordToken}
                 telegramToken={telegramToken}
                 onTelegramChange={setTelegramToken}
-                slackBotToken={slackBotToken}
-                onSlackBotChange={setSlackBotToken}
-                slackAppToken={slackAppToken}
-                onSlackAppChange={setSlackAppToken}
               />
             </div>
           </div>
 
-          {/* Divider */}
-          <hr className="my-6 border-stone-100" />
-
-          {/* Download Set */}
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-stone-500">
-              Download all 6 configs for{' '}
-              <span className="font-medium text-stone-700 capitalize">{provider}</span>
-            </p>
-            <button
-              onClick={downloadSet}
-              disabled={downloading}
-              className="cursor-pointer rounded-lg border border-stone-200 bg-stone-50 px-4 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {downloading ? 'Zipping...' : 'Download Set (.zip)'}
-            </button>
-          </div>
         </div>
       </section>
 
       {/* Card Grid */}
       <main className="mx-auto max-w-5xl px-6 pb-12">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {ROLES.map((role) => (
-            <RoleCard
-              key={role.configFile}
-              {...role}
-              configPath={`/configs/${provider}/${role.configFile}`}
-              whatsappPhone={whatsappPhone}
-              discordToken={discordToken}
-              telegramToken={telegramToken}
-              slackBotToken={slackBotToken}
-              slackAppToken={slackAppToken}
-            />
-          ))}
+          {(() => {
+            let firstDisabledSeen = false
+            return ROLES.map((role) => {
+              const isFirstDisabled = role.disabled && !firstDisabledSeen
+              if (role.disabled && !firstDisabledSeen) firstDisabledSeen = true
+              return (
+                <RoleCard
+                  key={role.configFile}
+                  {...role}
+                  configPath={`${configBase}/${role.configFile}`}
+                  telegramToken={telegramToken}
+                  isFirstDisabled={isFirstDisabled}
+                  onTokenWarning={showTokenWarning}
+                />
+              )
+            })
+          })()}
         </div>
       </main>
 
@@ -194,6 +245,13 @@ export default function App() {
 
       {/* Info Modal */}
       <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+
+      {/* Warning Toast */}
+      <WarningToast
+        message="Heads up — without a Bot Token, the OpenClaw build will fail."
+        visible={toastVisible}
+        onDone={() => setToastVisible(false)}
+      />
     </div>
   )
 }

@@ -19,7 +19,8 @@
     ]
   },
   "env": {
-    "OPENROUTER_API_KEY": "your-openrouter-api-key"
+    "OPENROUTER_API_KEY": "your-openrouter-api-key",
+    "TELEGRAM_BOT_TOKEN": ""
   },
   "channels": {
     "whatsapp": {

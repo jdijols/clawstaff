@@ -19,7 +19,8 @@
     ]
   },
   "env": {
-    "GEMINI_API_KEY": "your-google-api-key"
+    "GEMINI_API_KEY": "your-google-api-key",
+    "TELEGRAM_BOT_TOKEN": ""
   },
   "channels": {
     "whatsapp": {

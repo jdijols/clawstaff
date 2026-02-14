@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { isValidPhone } from '../../utils/messaging'
 
 function EyeIcon() {
   return (
@@ -16,12 +15,6 @@ function EyeOffIcon() {
       <path d="M2 2l12 12M6.5 6.5a2 2 0 0 0 2.83 2.83M4.2 4.2C2.7 5.3 1 8 1 8s2.5 5 7 5c1.3 0 2.5-.4 3.5-1M9.9 4.2C14 5.5 15 8 15 8s-2.5 5-7 5" />
     </svg>
   )
-}
-
-function validatePhone(value) {
-  if (!value) return null
-  const digits = value.replace(/[\s()-]/g, '')
-  return isValidPhone(value) ? null : 'Enter a valid international number (e.g. +15551234567)'
 }
 
 function TokenInput({ id, label, value, onChange, placeholder, helperText, helperLink, helperLinkText }) {
@@ -67,25 +60,71 @@ function TokenInput({ id, label, value, onChange, placeholder, helperText, helpe
   )
 }
 
+function DisabledInput({ label, placeholder, isFirstDisabled }) {
+  return (
+    <div className="group">
+      <div className="pointer-events-none select-none">
+        <label className="block text-sm font-medium text-stone-400">
+          {label}
+        </label>
+        <div className="relative mt-1.5">
+          <span
+            className={`pointer-events-none absolute -top-8 right-0 z-10 whitespace-nowrap rounded bg-stone-800 px-2 py-1 text-xs text-white shadow-lg transition-opacity ${
+              isFirstDisabled
+                ? 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
+                : 'opacity-0 sm:group-hover:opacity-100'
+            }`}
+          >
+            Coming soon
+          </span>
+          <input
+            type="text"
+            disabled
+            placeholder={placeholder}
+            className="w-full cursor-not-allowed rounded-lg border border-dashed border-stone-300 bg-stone-50 px-3 py-2 pr-10 text-sm text-stone-400 placeholder:text-stone-400"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function DisabledPhoneInput({ label, placeholder, isFirstDisabled }) {
+  return (
+    <div className="group">
+      <div className="pointer-events-none select-none">
+        <label className="block text-sm font-medium text-stone-400">
+          {label}
+        </label>
+        <div className="relative mt-1.5">
+          <span
+            className={`pointer-events-none absolute -top-8 right-0 z-10 whitespace-nowrap rounded bg-stone-800 px-2 py-1 text-xs text-white shadow-lg transition-opacity ${
+              isFirstDisabled
+                ? 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
+                : 'opacity-0 sm:group-hover:opacity-100'
+            }`}
+          >
+            Coming soon
+          </span>
+          <input
+            type="text"
+            disabled
+            placeholder={placeholder}
+            className="w-full cursor-not-allowed rounded-lg border border-dashed border-stone-300 bg-stone-50 px-3 py-2 text-sm text-stone-400 placeholder:text-stone-400"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function MessagingInputs({
-  whatsappPhone,
-  onWhatsappChange,
-  discordToken,
-  onDiscordChange,
   telegramToken,
   onTelegramChange,
-  slackBotToken,
-  onSlackBotChange,
-  slackAppToken,
-  onSlackAppChange,
 }) {
-  const [phoneBlurred, setPhoneBlurred] = useState(false)
-
-  const phoneError = phoneBlurred ? validatePhone(whatsappPhone) : null
-
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      {/* Telegram */}
+      {/* Telegram — enabled */}
       <TokenInput
         id="telegram-token"
         label="Telegram Bot Token"
@@ -97,67 +136,33 @@ export default function MessagingInputs({
         helperLinkText="@BotFather"
       />
 
-      {/* Discord */}
-      <TokenInput
-        id="discord-token"
+      {/* Discord — disabled */}
+      <DisabledInput
         label="Discord Bot Token"
-        value={discordToken}
-        onChange={onDiscordChange}
         placeholder="MTk4NjIy..."
-        helperText="Create a bot at the"
-        helperLink="https://discord.com/developers/applications"
-        helperLinkText="Discord Developer Portal"
+        isFirstDisabled
       />
 
-      {/* Slack Bot Token */}
-      <TokenInput
-        id="slack-bot-token"
+      {/* Slack Bot Token — disabled */}
+      <DisabledInput
         label="Slack Bot Token"
-        value={slackBotToken}
-        onChange={onSlackBotChange}
         placeholder="xoxb-..."
-        helperText="Create an app at"
-        helperLink="https://api.slack.com/quickstart"
-        helperLinkText="api.slack.com"
+        isFirstDisabled={false}
       />
 
-      {/* Slack App Token */}
-      <TokenInput
-        id="slack-app-token"
+      {/* Slack App Token — disabled */}
+      <DisabledInput
         label="Slack App Token"
-        value={slackAppToken}
-        onChange={onSlackAppChange}
         placeholder="xapp-..."
-        helperText="Socket Mode token from your"
-        helperLink="https://api.slack.com/apps"
-        helperLinkText="Slack app settings"
+        isFirstDisabled={false}
       />
 
-      {/* WhatsApp */}
-      <div>
-        <label htmlFor="whatsapp-phone" className="block text-sm font-medium text-stone-700">
-          WhatsApp Phone Number
-        </label>
-        <input
-          id="whatsapp-phone"
-          type="tel"
-          value={whatsappPhone}
-          onChange={(e) => onWhatsappChange(e.target.value)}
-          onFocus={() => { if (!whatsappPhone) onWhatsappChange('+1') }}
-          onBlur={() => setPhoneBlurred(true)}
-          placeholder="+1 (555) 123-4567"
-          className={`mt-1.5 w-full rounded-lg border bg-white px-3 py-2 text-sm text-stone-900 outline-none transition-colors placeholder:text-stone-400 focus:border-rust-400 focus:ring-1 focus:ring-rust-400 ${
-            phoneError ? 'border-red-400' : 'border-stone-200'
-          }`}
-        />
-        {phoneError ? (
-          <p className="mt-1.5 text-xs text-red-500">{phoneError}</p>
-        ) : (
-          <p className="mt-1.5 text-xs text-stone-400">
-            Your WhatsApp number for receiving messages
-          </p>
-        )}
-      </div>
+      {/* WhatsApp — disabled */}
+      <DisabledPhoneInput
+        label="WhatsApp Phone Number"
+        placeholder="+1 (555) 123-4567"
+        isFirstDisabled={false}
+      />
     </div>
   )
 }

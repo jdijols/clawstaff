@@ -39,20 +39,21 @@ export default function RoleCard({
   title,
   description,
   configPath,
-  whatsappPhone = '',
-  discordToken = '',
   telegramToken = '',
-  slackBotToken = '',
-  slackAppToken = '',
+  disabled = false,
+  isFirstDisabled = false,
+  onTokenWarning,
 }) {
   const [copyState, setCopyState] = useState('idle')
   const [dlState, setDlState] = useState('idle')
   const [previewOpen, setPreviewOpen] = useState(false)
 
-  const channels = { whatsappPhone, discordToken, telegramToken, slackBotToken, slackAppToken }
+  const channels = { telegramToken }
 
   const handleCopy = async (e) => {
     e.stopPropagation()
+    if (disabled) return
+    if (!telegramToken.trim() && onTokenWarning) onTokenWarning()
     try {
       const res = await fetch(configPath)
       const config = await res.json()
@@ -69,6 +70,8 @@ export default function RoleCard({
 
   const handleDownload = async (e) => {
     e.stopPropagation()
+    if (disabled) return
+    if (!telegramToken.trim() && onTokenWarning) onTokenWarning()
     try {
       const res = await fetch(configPath)
       const config = await res.json()
@@ -78,7 +81,7 @@ export default function RoleCard({
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = configPath.split('/').pop()
+      link.download = 'openclaw.json'
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -88,6 +91,29 @@ export default function RoleCard({
     } catch (err) {
       console.error('Failed to download config:', err)
     }
+  }
+
+  if (disabled) {
+    return (
+      <div className="group relative rounded-2xl border border-dashed border-stone-300 bg-stone-50 p-6">
+        <span
+          className={`pointer-events-none absolute top-3 right-3 z-10 whitespace-nowrap rounded bg-stone-800 px-2 py-1 text-xs text-white shadow-lg transition-opacity ${
+            isFirstDisabled
+              ? 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
+              : 'opacity-0 sm:group-hover:opacity-100'
+          }`}
+        >
+          Coming soon
+        </span>
+        <div className="pointer-events-none select-none">
+          <span className="text-3xl opacity-40" role="img" aria-label={title}>
+            {icon}
+          </span>
+          <h3 className="mt-4 text-lg font-semibold text-stone-400">{title}</h3>
+          <p className="mt-1 text-sm text-stone-400">{description}</p>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -18,6 +18,9 @@
       }
     ]
   },
+  "env": {
+    "TELEGRAM_BOT_TOKEN": ""
+  },
   "channels": {
     "whatsapp": {
       "dmPolicy": "allowlist",

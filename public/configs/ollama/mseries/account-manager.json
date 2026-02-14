@@ -3,23 +3,27 @@
     "defaults": {
       "workspace": "~/projects",
       "model": {
-        "primary": "openrouter/anthropic/claude-sonnet-4-5"
+        "primary": "ollama/llama3.2:3b"
+      },
+      "maxConcurrent": 4,
+      "contextTokens": 16000,
+      "subagents": {
+        "maxConcurrent": 8
       }
     },
     "list": [
       {
-        "id": "ux-designer",
+        "id": "account-manager",
         "default": true,
         "identity": {
-          "name": "UX Designer",
-          "emoji": "🎨",
-          "theme": "expert UX designer — wireframes, prototypes, and design systems"
+          "name": "Account Manager",
+          "emoji": "\ud83e\udd1d",
+          "theme": "expert account manager \u2014 proposals, client relationships, and growth"
         }
       }
     ]
   },
   "env": {
-    "OPENROUTER_API_KEY": "your-openrouter-api-key",
     "TELEGRAM_BOT_TOKEN": ""
   },
   "channels": {
@@ -49,13 +53,20 @@
     }
   },
   "tools": {
-    "profile": "design",
+    "profile": "general",
     "browser": {
       "enabled": true
     },
     "elevated": {
       "enabled": false
     }
+  },
+  "gateway": {
+    "mode": "local"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto"
   },
   "session": {
     "reset": {

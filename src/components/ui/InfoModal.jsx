@@ -5,13 +5,13 @@ const ANIM_DURATION = 250
 const STEPS = [
   {
     number: '1',
-    title: 'Configure your setup',
-    description: 'Choose a provider and optionally connect your messaging channels — WhatsApp, Discord, Telegram, and/or Slack.',
+    title: 'Configure your setup (Currently Ollama)',
+    description: 'Choose your hardware and paste your Telegram bot token.',
   },
   {
     number: '2',
-    title: 'Grab your configs',
-    description: 'Download individual roles or the full set as a ZIP.',
+    title: 'Download the Demo config',
+    description: 'Use the Demo card to copy or download the config file.',
   },
   {
     number: '3',
@@ -22,7 +22,12 @@ const STEPS = [
     number: '4',
     title: 'Validate and start',
     description: 'Run the doctor command, then launch OpenClaw.',
-    code: 'openclaw doctor --fix && openclaw',
+    code: 'openclaw doctor --fix && openclaw gateway',
+  },
+  {
+    number: '5',
+    title: 'Pair with Telegram',
+    description: 'Open Telegram and send any message to your bot. OpenClaw will prompt you to approve the pairing — once confirmed, you\'re connected.',
   },
 ]
 
@@ -158,7 +163,7 @@ export default function InfoModal({ open, onClose }) {
             Don't forget!
           </p>
           <p className="mt-1 text-sm text-stone-500">
-            Cloud providers need an API key. Replace the placeholder in your config's <code className="rounded bg-stone-200 px-1 py-0.5 text-xs font-mono text-stone-700">env</code> block, or add it to <code className="rounded bg-stone-200 px-1 py-0.5 text-xs font-mono text-stone-700">~/.openclaw/.env</code> — OpenClaw reads both.
+            Make sure Ollama is running and you've pulled the required model before starting. The <code className="rounded bg-stone-200 px-1 py-0.5 text-xs font-mono text-stone-700">openclaw doctor --fix</code> command will verify everything is set up correctly.
           </p>
         </div>
       </div>
