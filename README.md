@@ -46,7 +46,7 @@ Pick your LLM provider, optionally plug in your messaging tokens, and download p
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/ClawStaff.git
+git clone https://github.com/jasondijols/ClawStaff.git
 cd ClawStaff
 
 # Install dependencies
