@@ -125,7 +125,8 @@ export default function PreviewModal({
         margin: 0,
         width: '100%',
         maxWidth: 'none',
-        maxHeight: '95vh',
+        height: '95dvh',
+        maxHeight: '95dvh',
       }}
       className={`
         rounded-t-2xl border border-stone-200 bg-white p-0 shadow-xl
@@ -133,7 +134,7 @@ export default function PreviewModal({
         ${closing ? 'animate-slide-down backdrop:animate-backdrop-out' : 'animate-slide-up backdrop:animate-backdrop-in'}
       `}
     >
-      <div className="flex h-full max-h-[95vh] flex-col">
+      <div className="flex h-full flex-col">
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-stone-100 px-5 py-3.5 sm:px-6">
           <div className="flex items-center gap-3">
