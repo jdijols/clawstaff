@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { injectChannels } from '../../utils/messaging'
+import { copyToClipboard } from '../../utils/clipboard'
 import PreviewModal from './PreviewModal'
 import { CopyButton, DownloadButton } from './ActionButtons'
 
@@ -56,9 +57,11 @@ export default function RoleCard({
       const res = await fetch(configPath)
       const config = await res.json()
       injectChannels(config, channels)
-      await navigator.clipboard.writeText(JSON.stringify(config, null, 2))
-      setCopyState('done')
-      setTimeout(() => setCopyState('idle'), 2000)
+      const ok = await copyToClipboard(JSON.stringify(config, null, 2))
+      if (ok) {
+        setCopyState('done')
+        setTimeout(() => setCopyState('idle'), 2000)
+      }
     } catch (err) {
       console.error('Failed to copy config:', err)
     }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { injectChannels } from '../../utils/messaging'
+import { copyToClipboard } from '../../utils/clipboard'
 import { CopyButton, DownloadButton } from './ActionButtons'
 
 /* ── Syntax highlighting (lightweight, no deps) ── */
@@ -86,12 +87,10 @@ export default function PreviewModal({
   }
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(json)
+    const ok = await copyToClipboard(json)
+    if (ok) {
       setCopyState('done')
       setTimeout(() => setCopyState('idle'), 2000)
-    } catch (err) {
-      console.error('Copy failed:', err)
     }
   }
 
