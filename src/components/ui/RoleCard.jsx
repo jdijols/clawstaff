@@ -26,8 +26,8 @@ function EyeIcon({ className }) {
 function PreviewIcon() {
   return (
     <span className="relative flex h-6 w-6">
-      <CodeIcon className="absolute inset-0 text-stone-300 transition-opacity duration-200 group-hover:opacity-0" />
-      <EyeIcon className="absolute inset-0 text-stone-600 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+      <CodeIcon className="absolute inset-0 text-stone-300 opacity-0 transition-opacity duration-200 sm:opacity-100 sm:group-hover:opacity-0" />
+      <EyeIcon className="absolute inset-0 text-stone-600 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100" />
     </span>
   )
 }
@@ -94,7 +94,7 @@ export default function RoleCard({
     <>
       <div
         onClick={() => setPreviewOpen(true)}
-        className="group cursor-pointer rounded-2xl border border-stone-200 bg-white p-6 shadow-sm transition-all hover:border-rust-400/50 hover:shadow-md"
+        className="group cursor-pointer rounded-2xl border border-rust-400/50 bg-white p-6 shadow-md transition-all sm:border-stone-200 sm:shadow-sm sm:hover:border-rust-400/50 sm:hover:shadow-md"
       >
         <div className="flex items-center justify-between">
           <span className="text-3xl" role="img" aria-label={title}>

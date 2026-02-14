@@ -178,7 +178,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-6 pt-12 pb-8 sm:flex-row sm:justify-between">
+      <footer className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-6 pt-12 pb-8 text-center sm:flex-row sm:justify-between sm:text-left">
         <p className="text-sm text-stone-400">
           Stop building from scratch. Start with curated setups by ClawStaff.
         </p>
