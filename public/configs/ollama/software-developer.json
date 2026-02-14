@@ -1,0 +1,62 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "~/projects",
+      "model": {
+        "primary": "ollama/qwen2.5-coder:32b"
+      }
+    },
+    "list": [
+      {
+        "id": "software-developer",
+        "default": true,
+        "identity": {
+          "name": "Developer",
+          "emoji": "💻",
+          "theme": "senior software engineer — clean, tested, production-ready code"
+        }
+      }
+    ]
+  },
+  "channels": {
+    "whatsapp": {
+      "dmPolicy": "allowlist",
+      "allowFrom": [],
+      "sendReadReceipts": true
+    },
+    "discord": {
+      "enabled": true,
+      "token": "",
+      "dm": {
+        "enabled": true,
+        "policy": "allowlist",
+        "allowFrom": []
+      }
+    },
+    "telegram": {
+      "enabled": true,
+      "botToken": "",
+      "dmPolicy": "pairing"
+    },
+    "slack": {
+      "enabled": true,
+      "botToken": "",
+      "appToken": ""
+    }
+  },
+  "tools": {
+    "profile": "coding",
+    "browser": {
+      "enabled": true
+    },
+    "elevated": {
+      "enabled": false
+    }
+  },
+  "session": {
+    "reset": {
+      "mode": "daily",
+      "atHour": 4
+    }
+  }
+}

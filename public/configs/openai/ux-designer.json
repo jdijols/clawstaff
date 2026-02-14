@@ -1,0 +1,65 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "~/projects",
+      "model": {
+        "primary": "openai/gpt-5.2"
+      }
+    },
+    "list": [
+      {
+        "id": "ux-designer",
+        "default": true,
+        "identity": {
+          "name": "UX Designer",
+          "emoji": "🎨",
+          "theme": "expert UX designer — wireframes, prototypes, and design systems"
+        }
+      }
+    ]
+  },
+  "env": {
+    "OPENAI_API_KEY": "your-openai-api-key"
+  },
+  "channels": {
+    "whatsapp": {
+      "dmPolicy": "allowlist",
+      "allowFrom": [],
+      "sendReadReceipts": true
+    },
+    "discord": {
+      "enabled": true,
+      "token": "",
+      "dm": {
+        "enabled": true,
+        "policy": "allowlist",
+        "allowFrom": []
+      }
+    },
+    "telegram": {
+      "enabled": true,
+      "botToken": "",
+      "dmPolicy": "pairing"
+    },
+    "slack": {
+      "enabled": true,
+      "botToken": "",
+      "appToken": ""
+    }
+  },
+  "tools": {
+    "profile": "design",
+    "browser": {
+      "enabled": true
+    },
+    "elevated": {
+      "enabled": false
+    }
+  },
+  "session": {
+    "reset": {
+      "mode": "daily",
+      "atHour": 4
+    }
+  }
+}

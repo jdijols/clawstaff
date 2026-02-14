@@ -1,0 +1,65 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "~/projects",
+      "model": {
+        "primary": "google/gemini-3-pro-preview"
+      }
+    },
+    "list": [
+      {
+        "id": "qa-tester",
+        "default": true,
+        "identity": {
+          "name": "QA Tester",
+          "emoji": "🧪",
+          "theme": "expert QA engineer — test cases, automation, and coverage"
+        }
+      }
+    ]
+  },
+  "env": {
+    "GEMINI_API_KEY": "your-google-api-key"
+  },
+  "channels": {
+    "whatsapp": {
+      "dmPolicy": "allowlist",
+      "allowFrom": [],
+      "sendReadReceipts": true
+    },
+    "discord": {
+      "enabled": true,
+      "token": "",
+      "dm": {
+        "enabled": true,
+        "policy": "allowlist",
+        "allowFrom": []
+      }
+    },
+    "telegram": {
+      "enabled": true,
+      "botToken": "",
+      "dmPolicy": "pairing"
+    },
+    "slack": {
+      "enabled": true,
+      "botToken": "",
+      "appToken": ""
+    }
+  },
+  "tools": {
+    "profile": "coding",
+    "browser": {
+      "enabled": true
+    },
+    "elevated": {
+      "enabled": false
+    }
+  },
+  "session": {
+    "reset": {
+      "mode": "daily",
+      "atHour": 4
+    }
+  }
+}

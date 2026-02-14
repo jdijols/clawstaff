@@ -1,0 +1,65 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "~/projects",
+      "model": {
+        "primary": "openrouter/anthropic/claude-sonnet-4-5"
+      }
+    },
+    "list": [
+      {
+        "id": "account-manager",
+        "default": true,
+        "identity": {
+          "name": "Account Manager",
+          "emoji": "🤝",
+          "theme": "expert account manager — proposals, client relationships, and growth"
+        }
+      }
+    ]
+  },
+  "env": {
+    "OPENROUTER_API_KEY": "your-openrouter-api-key"
+  },
+  "channels": {
+    "whatsapp": {
+      "dmPolicy": "allowlist",
+      "allowFrom": [],
+      "sendReadReceipts": true
+    },
+    "discord": {
+      "enabled": true,
+      "token": "",
+      "dm": {
+        "enabled": true,
+        "policy": "allowlist",
+        "allowFrom": []
+      }
+    },
+    "telegram": {
+      "enabled": true,
+      "botToken": "",
+      "dmPolicy": "pairing"
+    },
+    "slack": {
+      "enabled": true,
+      "botToken": "",
+      "appToken": ""
+    }
+  },
+  "tools": {
+    "profile": "general",
+    "browser": {
+      "enabled": true
+    },
+    "elevated": {
+      "enabled": false
+    }
+  },
+  "session": {
+    "reset": {
+      "mode": "daily",
+      "atHour": 4
+    }
+  }
+}

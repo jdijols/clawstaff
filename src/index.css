@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-rust-400: #e07a5f;
+  --color-rust-500: #d4674a;
+  --color-rust-600: #c25538;
+  --color-rust-700: #a8452d;
+  --animate-slide-up: slide-up 0.3s ease-out both;
+  --animate-slide-down: slide-down 0.25s ease-in both;
+  --animate-fade-in: modal-in 0.3s ease-out both;
+  --animate-fade-out: modal-out 0.25s ease-in both;
+  --animate-backdrop-in: backdrop-in 0.3s ease-out both;
+  --animate-backdrop-out: backdrop-out 0.25s ease-in both;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes modal-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.97); }
+}
+
+@keyframes backdrop-in {
+  from { background-color: rgba(28, 25, 23, 0); }
+  to   { background-color: rgba(28, 25, 23, 0.4); }
+}
+
+@keyframes backdrop-out {
+  from { background-color: rgba(28, 25, 23, 0.4); }
+  to   { background-color: rgba(28, 25, 23, 0); }
+}
+

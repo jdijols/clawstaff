@@ -1,0 +1,65 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "~/projects",
+      "model": {
+        "primary": "openrouter/google/gemini-3-pro-preview"
+      }
+    },
+    "list": [
+      {
+        "id": "ux-researcher",
+        "default": true,
+        "identity": {
+          "name": "UX Researcher",
+          "emoji": "🔬",
+          "theme": "expert UX researcher — research plans, data analysis, and insights"
+        }
+      }
+    ]
+  },
+  "env": {
+    "OPENROUTER_API_KEY": "your-openrouter-api-key"
+  },
+  "channels": {
+    "whatsapp": {
+      "dmPolicy": "allowlist",
+      "allowFrom": [],
+      "sendReadReceipts": true
+    },
+    "discord": {
+      "enabled": true,
+      "token": "",
+      "dm": {
+        "enabled": true,
+        "policy": "allowlist",
+        "allowFrom": []
+      }
+    },
+    "telegram": {
+      "enabled": true,
+      "botToken": "",
+      "dmPolicy": "pairing"
+    },
+    "slack": {
+      "enabled": true,
+      "botToken": "",
+      "appToken": ""
+    }
+  },
+  "tools": {
+    "profile": "research",
+    "browser": {
+      "enabled": true
+    },
+    "elevated": {
+      "enabled": false
+    }
+  },
+  "session": {
+    "reset": {
+      "mode": "daily",
+      "atHour": 4
+    }
+  }
+}
