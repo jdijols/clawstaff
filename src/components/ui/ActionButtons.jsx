@@ -25,28 +25,34 @@ function DownloadIcon() {
 
 const BTN_BASE = 'w-[7.5rem] cursor-pointer justify-center inline-flex items-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-colors'
 
-export function CopyButton({ state, onClick, className = '' }) {
+export function CopyButton({ state, onClick, className = '', disabled = false }) {
   const isDone = state === 'done'
+  const isError = state === 'error'
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={`${BTN_BASE} border border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100 hover:text-stone-900 ${className}`}
+      disabled={disabled}
+      className={`${BTN_BASE} border border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-rust-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-stone-50 disabled:hover:text-stone-600 ${className}`}
     >
       {isDone ? <CheckIcon /> : <CopyIcon />}
-      {isDone ? 'Copied!' : 'Copy'}
+      {isDone ? 'Copied!' : isError ? 'Copy failed' : 'Copy'}
     </button>
   )
 }
 
-export function DownloadButton({ state, onClick, className = '' }) {
+export function DownloadButton({ state, onClick, className = '', disabled = false }) {
   const isDone = state === 'done'
+  const isError = state === 'error'
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={`${BTN_BASE} bg-rust-600 text-white hover:bg-rust-500 ${className}`}
+      disabled={disabled}
+      className={`${BTN_BASE} bg-rust-600 text-white hover:bg-rust-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rust-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-rust-600 ${className}`}
     >
       {isDone ? <CheckIcon /> : <DownloadIcon />}
-      {isDone ? 'Downloaded!' : 'Download'}
+      {isDone ? 'Downloaded!' : isError ? 'Download failed' : 'Download'}
     </button>
   )
 }

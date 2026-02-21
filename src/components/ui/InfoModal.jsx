@@ -5,13 +5,13 @@ const ANIM_DURATION = 250
 const STEPS = [
   {
     number: '1',
-    title: 'Configure your setup (Currently Ollama)',
-    description: 'Choose your hardware and paste your Telegram bot token.',
+    title: 'Configure your setup',
+    description: 'Choose your provider (and hardware if you use Ollama). Add your Telegram bot token and any other messaging credentials you need.',
   },
   {
     number: '2',
-    title: 'Download the Demo config',
-    description: 'Use the Demo card to copy or download the config file.',
+    title: 'Download config(s)',
+    description: 'Use a role card to copy or download a single config. Use "Download" or "Download Set" in the header—and the "Download Set (.zip)" row in the config panel when you have multiple roles—to get all configs for your chosen provider.',
   },
   {
     number: '3',
@@ -21,13 +21,13 @@ const STEPS = [
   {
     number: '4',
     title: 'Validate and start',
-    description: 'Run the doctor command, then launch OpenClaw.',
+    description: 'Run the doctor command to verify your setup, then launch OpenClaw.',
     code: 'openclaw doctor --fix && openclaw gateway',
   },
   {
     number: '5',
-    title: 'Pair with Telegram',
-    description: 'Open Telegram and send any message to your bot. OpenClaw will prompt you to approve the pairing — once confirmed, you\'re connected.',
+    title: 'Connect messaging',
+    description: 'OpenClaw uses the channels you added in step 1. For Telegram: send a message to your bot, then approve the pairing when prompted.',
   },
 ]
 
@@ -49,15 +49,17 @@ function CheckIcon({ className }) {
 }
 
 function CodeBlock({ code }) {
-  const [copied, setCopied] = useState(false)
+  const [copyState, setCopyState] = useState('idle') // 'idle' | 'done' | 'error'
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(code)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
+      setCopyState('done')
+      setTimeout(() => setCopyState('idle'), 1500)
     } catch (err) {
       console.error('Failed to copy:', err)
+      setCopyState('error')
+      setTimeout(() => setCopyState('idle'), 1500)
     }
   }
 
@@ -72,9 +74,9 @@ function CodeBlock({ code }) {
         aria-label="Copy to clipboard"
       >
         <span className="relative flex items-center">
-          {copied ? <CheckIcon className="text-green-600" /> : <CopyIcon />}
+          {copyState === 'done' ? <CheckIcon className="text-green-600" /> : <CopyIcon />}
           <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 rounded bg-stone-800 px-1.5 py-0.5 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover/btn:opacity-100">
-            {copied ? 'Copied' : 'Copy'}
+            {copyState === 'done' ? 'Copied' : copyState === 'error' ? 'Copy failed' : 'Copy'}
           </span>
         </span>
       </button>
@@ -82,7 +84,7 @@ function CodeBlock({ code }) {
   )
 }
 
-export default function InfoModal({ open, onClose }) {
+export default function InfoModal({ open, onClose, onClosed }) {
   const dialogRef = useRef(null)
   const [closing, setClosing] = useState(false)
 
@@ -101,6 +103,7 @@ export default function InfoModal({ open, onClose }) {
         document.body.style.overflow = ''
         el.close()
         setClosing(false)
+        onClosed?.()
       }
       el.addEventListener('animationend', onEnd)
       // Fallback in case animationend doesn't fire
@@ -108,7 +111,7 @@ export default function InfoModal({ open, onClose }) {
     }
 
     return () => { document.body.style.overflow = '' }
-  }, [open])
+  }, [open, onClosed])
 
   const handleBackdropClick = (e) => {
     if (e.target === dialogRef.current) onClose()
@@ -130,7 +133,8 @@ export default function InfoModal({ open, onClose }) {
           </h2>
           <button
             onClick={onClose}
-            className="cursor-pointer -mt-1 -mr-1 rounded-lg p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600"
+            aria-label="Close"
+            className="cursor-pointer -mt-1 -mr-1 rounded-lg p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-rust-400 focus-visible:ring-offset-2"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M5 5l10 10M15 5L5 15" />
@@ -163,7 +167,7 @@ export default function InfoModal({ open, onClose }) {
             Don't forget!
           </p>
           <p className="mt-1 text-sm text-stone-500">
-            Make sure Ollama is running and you've pulled the required model before starting. The <code className="rounded bg-stone-200 px-1 py-0.5 text-xs font-mono text-stone-700">openclaw doctor --fix</code> command will verify everything is set up correctly.
+            Run <code className="rounded bg-stone-200 px-1 py-0.5 text-xs font-mono text-stone-700">openclaw doctor --fix</code> to verify your setup. If you use Ollama, ensure it's running and you've pulled the required model. For cloud providers, ensure your API keys are configured.
           </p>
         </div>
       </div>

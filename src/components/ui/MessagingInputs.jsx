@@ -32,7 +32,7 @@ function TokenInput({ id, label, value, onChange, placeholder, helperText, helpe
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 pr-10 text-sm text-stone-900 outline-none transition-colors placeholder:text-stone-400 focus:border-rust-400 focus:ring-1 focus:ring-rust-400"
+          className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 pr-10 text-sm text-stone-900 outline-none transition-colors placeholder:text-stone-400 hover:border-rust-400/50 focus:border-rust-400 focus:ring-1 focus:ring-rust-400"
         />
         <button
           type="button"
@@ -44,76 +44,22 @@ function TokenInput({ id, label, value, onChange, placeholder, helperText, helpe
         </button>
       </div>
       <p className="mt-1.5 text-xs text-stone-400">
-        {helperText}{' '}
-        {helperLink && (
-          <a
-            href={helperLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-rust-600 underline underline-offset-2 hover:text-rust-500"
-          >
-            {helperLinkText}
-          </a>
+        {helperLink ? (
+          <>
+            {helperText}{' '}
+            <a
+              href={helperLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-rust-600 underline underline-offset-2 hover:text-rust-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rust-400 focus-visible:ring-offset-1 rounded"
+            >
+              {helperLinkText}
+            </a>
+          </>
+        ) : (
+          helperText
         )}
       </p>
-    </div>
-  )
-}
-
-function DisabledInput({ label, placeholder, isFirstDisabled }) {
-  return (
-    <div className="group">
-      <div className="pointer-events-none select-none">
-        <label className="block text-sm font-medium text-stone-400">
-          {label}
-        </label>
-        <div className="relative mt-1.5">
-          <span
-            className={`pointer-events-none absolute -top-8 right-0 z-10 whitespace-nowrap rounded bg-stone-800 px-2 py-1 text-xs text-white shadow-lg transition-opacity ${
-              isFirstDisabled
-                ? 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
-                : 'opacity-0 sm:group-hover:opacity-100'
-            }`}
-          >
-            Coming soon
-          </span>
-          <input
-            type="text"
-            disabled
-            placeholder={placeholder}
-            className="w-full cursor-not-allowed rounded-lg border border-dashed border-stone-300 bg-stone-50 px-3 py-2 pr-10 text-sm text-stone-400 placeholder:text-stone-400"
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function DisabledPhoneInput({ label, placeholder, isFirstDisabled }) {
-  return (
-    <div className="group">
-      <div className="pointer-events-none select-none">
-        <label className="block text-sm font-medium text-stone-400">
-          {label}
-        </label>
-        <div className="relative mt-1.5">
-          <span
-            className={`pointer-events-none absolute -top-8 right-0 z-10 whitespace-nowrap rounded bg-stone-800 px-2 py-1 text-xs text-white shadow-lg transition-opacity ${
-              isFirstDisabled
-                ? 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
-                : 'opacity-0 sm:group-hover:opacity-100'
-            }`}
-          >
-            Coming soon
-          </span>
-          <input
-            type="text"
-            disabled
-            placeholder={placeholder}
-            className="w-full cursor-not-allowed rounded-lg border border-dashed border-stone-300 bg-stone-50 px-3 py-2 text-sm text-stone-400 placeholder:text-stone-400"
-          />
-        </div>
-      </div>
     </div>
   )
 }
@@ -121,10 +67,17 @@ function DisabledPhoneInput({ label, placeholder, isFirstDisabled }) {
 export default function MessagingInputs({
   telegramToken,
   onTelegramChange,
+  discordToken = '',
+  onDiscordChange,
+  slackBotToken = '',
+  onSlackBotChange,
+  slackAppToken = '',
+  onSlackAppChange,
+  whatsAppPhone = '',
+  onWhatsAppChange,
 }) {
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      {/* Telegram — enabled */}
       <TokenInput
         id="telegram-token"
         label="Telegram Bot Token"
@@ -136,32 +89,44 @@ export default function MessagingInputs({
         helperLinkText="@BotFather"
       />
 
-      {/* Discord — disabled */}
-      <DisabledInput
+      <TokenInput
+        id="discord-token"
         label="Discord Bot Token"
+        value={discordToken}
+        onChange={onDiscordChange || (() => {})}
         placeholder="MTk4NjIy..."
-        isFirstDisabled
+        helperText="Create an app at"
+        helperLink="https://discord.com/developers/applications"
+        helperLinkText="Discord Developer Portal"
       />
 
-      {/* Slack Bot Token — disabled */}
-      <DisabledInput
+      <TokenInput
+        id="slack-bot-token"
         label="Slack Bot Token"
+        value={slackBotToken}
+        onChange={onSlackBotChange || (() => {})}
         placeholder="xoxb-..."
-        isFirstDisabled={false}
+        helperText="Create a bot at"
+        helperLink="https://api.slack.com/apps"
+        helperLinkText="Slack API"
       />
 
-      {/* Slack App Token — disabled */}
-      <DisabledInput
+      <TokenInput
+        id="slack-app-token"
         label="Slack App Token"
+        value={slackAppToken}
+        onChange={onSlackAppChange || (() => {})}
         placeholder="xapp-..."
-        isFirstDisabled={false}
+        helperText="Required for Socket Mode."
       />
 
-      {/* WhatsApp — disabled */}
-      <DisabledPhoneInput
+      <TokenInput
+        id="whatsapp-phone"
         label="WhatsApp Phone Number"
+        value={whatsAppPhone}
+        onChange={onWhatsAppChange || (() => {})}
         placeholder="+1 (555) 123-4567"
-        isFirstDisabled={false}
+        helperText="Your WhatsApp number for receiving messages"
       />
     </div>
   )

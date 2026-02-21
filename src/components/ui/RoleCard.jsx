@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { injectChannels } from '../../utils/messaging'
 import { copyToClipboard } from '../../utils/clipboard'
 import PreviewModal from './PreviewModal'
@@ -47,6 +47,7 @@ export default function RoleCard({
   const [copyState, setCopyState] = useState('idle')
   const [dlState, setDlState] = useState('idle')
   const [previewOpen, setPreviewOpen] = useState(false)
+  const cardRef = useRef(null)
 
   const channels = { telegramToken }
 
@@ -56,15 +57,25 @@ export default function RoleCard({
     if (!telegramToken.trim() && onTokenWarning) onTokenWarning()
     try {
       const res = await fetch(configPath)
+      if (!res.ok) {
+        setCopyState('error')
+        setTimeout(() => setCopyState('idle'), 2000)
+        return
+      }
       const config = await res.json()
       injectChannels(config, channels)
       const ok = await copyToClipboard(JSON.stringify(config, null, 2))
       if (ok) {
         setCopyState('done')
         setTimeout(() => setCopyState('idle'), 2000)
+      } else {
+        setCopyState('error')
+        setTimeout(() => setCopyState('idle'), 2000)
       }
     } catch (err) {
       console.error('Failed to copy config:', err)
+      setCopyState('error')
+      setTimeout(() => setCopyState('idle'), 2000)
     }
   }
 
@@ -74,6 +85,11 @@ export default function RoleCard({
     if (!telegramToken.trim() && onTokenWarning) onTokenWarning()
     try {
       const res = await fetch(configPath)
+      if (!res.ok) {
+        setDlState('error')
+        setTimeout(() => setDlState('idle'), 2000)
+        return
+      }
       const config = await res.json()
       injectChannels(config, channels)
       const merged = JSON.stringify(config, null, 2)
@@ -90,21 +106,14 @@ export default function RoleCard({
       setTimeout(() => setDlState('idle'), 2000)
     } catch (err) {
       console.error('Failed to download config:', err)
+      setDlState('error')
+      setTimeout(() => setDlState('idle'), 2000)
     }
   }
 
   if (disabled) {
     return (
       <div className="group relative rounded-2xl border border-dashed border-stone-300 bg-stone-50 p-6">
-        <span
-          className={`pointer-events-none absolute top-3 right-3 z-10 whitespace-nowrap rounded bg-stone-800 px-2 py-1 text-xs text-white shadow-lg transition-opacity ${
-            isFirstDisabled
-              ? 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
-              : 'opacity-0 sm:group-hover:opacity-100'
-          }`}
-        >
-          Coming soon
-        </span>
         <div className="pointer-events-none select-none">
           <span className="text-3xl opacity-40" role="img" aria-label={title}>
             {icon}
@@ -116,11 +125,24 @@ export default function RoleCard({
     )
   }
 
+  const openPreview = () => setPreviewOpen(true)
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      openPreview()
+    }
+  }
+
   return (
     <>
       <div
-        onClick={() => setPreviewOpen(true)}
-        className="group cursor-pointer rounded-2xl border border-rust-400/50 bg-white p-6 shadow-md transition-all sm:border-stone-200 sm:shadow-sm sm:hover:border-rust-400/50 sm:hover:shadow-md"
+        ref={cardRef}
+        role="button"
+        tabIndex={0}
+        onClick={openPreview}
+        onKeyDown={handleKeyDown}
+        aria-label={`Preview ${title} config`}
+        className="group cursor-pointer rounded-2xl border border-rust-400/50 bg-white p-6 shadow-md transition-all sm:border-stone-200 sm:shadow-sm sm:hover:border-rust-400/50 sm:hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-rust-400 focus-visible:ring-offset-2"
       >
         <div className="flex items-center justify-between">
           <span className="text-3xl" role="img" aria-label={title}>
@@ -141,6 +163,7 @@ export default function RoleCard({
       <PreviewModal
         open={previewOpen}
         onClose={() => setPreviewOpen(false)}
+        onClosed={() => cardRef.current?.focus()}
         configPath={configPath}
         title={title}
         channels={channels}

@@ -49,6 +49,7 @@ function highlightJSON(json) {
 export default function PreviewModal({
   open,
   onClose,
+  onClosed,
   configPath,
   title,
   channels,
@@ -56,6 +57,7 @@ export default function PreviewModal({
   const dialogRef = useRef(null)
   const warningTimer = useRef(null)
   const [json, setJson] = useState('')
+  const [loadError, setLoadError] = useState(false)
   const [copyState, setCopyState] = useState('idle')
   const [dlState, setDlState] = useState('idle')
   const [closing, setClosing] = useState(false)
@@ -85,25 +87,37 @@ export default function PreviewModal({
         document.body.style.overflow = ''
         el.close()
         setClosing(false)
+        onClosed?.()
       }
       el.addEventListener('animationend', onEnd)
     }
 
     return () => { document.body.style.overflow = '' }
-  }, [open])
+  }, [open, onClosed])
 
   // Fetch & merge config when opened or inputs change
   useEffect(() => {
     if (!open || !configPath) return
     let cancelled = false
+    setLoadError(false)
     ;(async () => {
       try {
         const res = await fetch(configPath)
+        if (!res.ok) {
+          if (!cancelled) {
+            setLoadError(true)
+            setJson('')
+          }
+          return
+        }
         const config = await res.json()
         injectChannels(config, channels)
         if (!cancelled) setJson(JSON.stringify(config, null, 2))
       } catch (err) {
-        if (!cancelled) setJson('// Failed to load config')
+        if (!cancelled) {
+          setLoadError(true)
+          setJson('')
+        }
       }
     })()
     return () => { cancelled = true }
@@ -114,15 +128,20 @@ export default function PreviewModal({
   }
 
   const handleCopy = async () => {
+    if (loadError) return
     flashWarning()
     const ok = await copyToClipboard(json)
     if (ok) {
       setCopyState('done')
       setTimeout(() => setCopyState('idle'), 2000)
+    } else {
+      setCopyState('error')
+      setTimeout(() => setCopyState('idle'), 2000)
     }
   }
 
   const handleDownload = () => {
+    if (loadError) return
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -169,8 +188,8 @@ export default function PreviewModal({
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-stone-100 px-5 py-3.5 sm:px-6">
           <div className="flex items-center gap-3">
-            <CopyButton state={copyState} onClick={handleCopy} />
-            <DownloadButton state={dlState} onClick={handleDownload} />
+            <CopyButton state={copyState} onClick={handleCopy} disabled={loadError} />
+            <DownloadButton state={dlState} onClick={handleDownload} disabled={loadError} />
 
             {/* Title */}
             <span className="hidden sm:inline text-sm font-medium text-stone-400">
@@ -181,7 +200,8 @@ export default function PreviewModal({
           {/* Close */}
           <button
             onClick={onClose}
-            className="cursor-pointer rounded-lg p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600"
+            aria-label="Close"
+            className="cursor-pointer rounded-lg p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-rust-400 focus-visible:ring-offset-2"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M5 5l10 10M15 5L5 15" />
@@ -191,9 +211,15 @@ export default function PreviewModal({
 
         {/* JSON Body */}
         <div className="flex-1 overflow-auto p-5 sm:p-6">
-          <pre className="text-[13px] leading-relaxed font-mono">
-            <code dangerouslySetInnerHTML={{ __html: highlighted }} />
-          </pre>
+          {loadError ? (
+            <p className="text-sm text-stone-500">
+              Failed to load config. Check the path and try again.
+            </p>
+          ) : (
+            <pre className="text-[13px] leading-relaxed font-mono">
+              <code dangerouslySetInnerHTML={{ __html: highlighted }} />
+            </pre>
+          )}
         </div>
 
         {/* Mobile drag hint */}
